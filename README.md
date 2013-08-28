@@ -17,6 +17,11 @@ App.module('A', {
 	sayWhat: function() {
 		return 'what?';
 	}
+})
+.module('B', {
+	init: function () {
+		// Do stuff
+	},
 });
 
 App.ready(function() {
