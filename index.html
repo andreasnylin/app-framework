@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>App framework</title>
+</head>
+<body>
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="app.js"></script>
+	<script>
+
+		App.module('A', {
+			init: function () {
+				console.log('Module ' + this.name + ' was initialized');
+			},
+			name: 'A',
+			sayWhat: function() {
+				return 'what?';
+			}
+		})
+		.module('B', {
+			init: function () {
+				console.log('Module ' + this.name + ' was initialized');
+			},
+			sayCheese: function() {
+				return 'Cheese!';
+			},
+			name: 'B'
+		})
+		.ready(function() {
+			console.log(App.module('B').sayCheese());
+			console.log('All done!');
+		});
+		
+		console.log(App.module('A').sayWhat());
+
+	</script>
+
+</body>
+</html>
