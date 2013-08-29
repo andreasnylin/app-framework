@@ -9,7 +9,11 @@
 	<script src="app.js"></script>
 	<script>
 
-		App.module('A', {
+		App.global(
+			{ kaffe: 'kaka' }
+		)
+		.global('cola', 'chips')
+		.module('A', {
 			init: function () {
 				console.log('Module ' + this.name + ' was initialized');
 			},
@@ -22,19 +26,32 @@
 			init: function () {
 				console.log('Module ' + this.name + ' was initialized');
 			},
+			require: 'required-lib.js',
 			sayCheese: function() {
 				return 'Cheese!';
 			},
 			name: 'B'
 		})
+		.module({
+			init: function () {
+				console.log('Unnamed module was initialized');
+			}
+		})
 		.ready(function() {
 			console.log(App.module('B').sayCheese());
 			console.log('All done!');
 		});
-		
-		console.log(App.module('A').sayWhat());
 
 	</script>
+
+	Methods
+	---------
+
+	global
+
+	module
+
+	ready
 
 </body>
 </html>
