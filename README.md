@@ -8,23 +8,35 @@ Example of usage
 ----------------
 
 ```javascript
-App.module('A', {
+App.global({
+	'a': 1,
+	'b': 2
+})
+.global('c', 3)
+.module('A', {
 	init: function () {
 		console.log('Module ' + this.name + ' was initialized');
-		$('#something').click(App.module('A').sayWhat);
 	},
-	name: 'A',
-	sayWhat: function() {
-		return 'what?';
+	helloWorld: function() {
+		console.log('Hello world!');
 	}
 })
-.module('B', {
+.module({
 	init: function () {
-		// Do stuff
-	},
+		console.log('Unnamed module was initialized');
+	}
+})
+.ready(function() {
+	App.module('A').helloWorld();
+	console.log('All done!');
+	console.log(App.global('c'));
 });
 
-App.ready(function() {
-  console.log('All modules are initialized. We are good to go!');
-});
+// This could be in another js file
+App.module('B', {
+	init: function () {
+		console.log('Module ' + this.name + ' was initialized');
+	},
+	require: ['required-lib.js', 'required-lib2.js']
+})
 ```
