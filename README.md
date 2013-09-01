@@ -69,7 +69,7 @@ App.global('name');
 
 ###App.module()
 
-Use to register or retrieve a module.
+Use to register or retrieve a module. A module must have an init function defined.
 ```javascript
 // Register a module
 App.module('name', { 
@@ -90,6 +90,7 @@ App.module({
 	init: function () { 
 		// ...
 	},
+	// Can also be a single string value require: 'script.js'
 	require: ['script1.js', 'script2.js']
 });
 
