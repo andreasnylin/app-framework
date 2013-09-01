@@ -1,8 +1,9 @@
 /*
-	App framework version 0.3 2013-08-29
+	App framework version 0.4 2013-08-29
 	Created by Andreas Nylin andreas.nylin@gmail.com
 */
-var App = new function () {
+var App = (function () {
+	'use strict';
 	// Stores all modules
 	var _modules = {},
 		// Stores all ready handlers
@@ -34,18 +35,19 @@ var App = new function () {
 	* - Registers a module with the specified name
 	*/
 	function _module() {
-		var module, name;
-
 		if (arguments.length === 1) {
 			var argument = arguments[0];
 
+			// Single string argument - return the module with the specified name
 			if(_util.isString(argument)) {
 				return _modules[argument];
 			}
+			// Single object argument - register unnamed module
 			else if(_util.isObject(argument)) {
 				_registerModule('unnamed' + _unnamedIndex++, argument);
 			}
 		}
+		// Two arguments - register module with name
 		else if (arguments.length === 2) {
 			var name = arguments[0],
 				module = arguments[1];
@@ -68,6 +70,7 @@ var App = new function () {
 	*/
 	function _registerModule(name, module) {
 		if(_validateModule(module)) {
+			module.name = name;
 			_modules[name] = module;
 		}
 	}
@@ -90,17 +93,28 @@ var App = new function () {
 	* Loads the script from the specified url and runs the callback when done
 	* Parameters: {Object} module 
 	* - The current module that requires the script
-	* Parameters: {String} sriptUrl 
-	* - The script source to load
+	* Parameters: {String} or {Array} scripts 
+	* - The script(s) source to load. Single string url or array of urls.
 	* Parameters: {Function} callback 
 	* - Callback method to run when the script has loaded
 	*/
-	function _loadScript(module, sriptUrl, callback) {
-		var script = document.createElement('script');
-		document.head.appendChild(script);
-		script.src = sriptUrl;
-		script.onload = function () {
-			callback.call(module);
+	function _loadScript(module, scripts, callback) {
+		var scriptArray = _util.isString(scripts) ? [scripts] : scripts,
+			scriptsToLoad = scriptArray.length,
+			scriptElement,
+			currentScript,
+			scriptLoaded = function() {
+				if(--scriptsToLoad === 0) {
+					callback.call(module);
+				}
+			};
+
+		while(currentScript = scriptArray.shift()) {
+			scriptElement = document.createElement('script');
+			document.head.appendChild(scriptElement);
+
+			scriptElement.onload = scriptLoaded;
+			scriptElement.src = currentScript;
 		}
 	}
 	
@@ -130,19 +144,27 @@ var App = new function () {
 	* - Object with keys/values to store
 	*/
 	function _global() {
-		// TODO: Rewrite this
-		if (arguments.length === 1 && typeof arguments[0] === 'object') {
-			for (var key in arguments[0]) {
-				_globals[key] = arguments[0][key];
-			}
+		if (arguments.length === 1) {
+			var argument = arguments[0];
+			
+			if(_util.isObject(argument)) {
+				for (var key in argument) {
+					if(argument.hasOwnProperty(key)) {
+						_globals[key] = argument[key];
+					}
+				}
 
-			return this;
+				return this;
+			}
+			else if(_util.isString(argument)) {
+				return _globals[argument];
+			}
 		}
-		else if (arguments.length === 1 && typeof arguments[0] === 'string') {
-			return _globals[arguments[0]];
-		}
-		else if (arguments.length === 2 && typeof arguments[0] === 'string') {
-			_globals[arguments[0]] = arguments[1];
+		else if (arguments.length === 2) {
+			var name = arguments[0],
+				value = arguments[1];
+
+			_globals[name] = value;
 
 			return this;
 		}
@@ -153,17 +175,19 @@ var App = new function () {
 	*/
 	function _init() {				
 		$(function () {
-			var m;
-
+			// Loop each module and run the init method
 			$.each(_modules, function () {
+				// Load scripts before running init method
 				if ('require' in this) {
 					_loadScript(this, this.require, this.init);
 				}
+				// Run the init method of the module
 				else if('init' in this) {
 					this.init();
 				}
 			});
 			
+			// Loop all readyhandlers and run them
 			$.each(_readyHandlers, function() {
 				this.call(this);
 			});
@@ -179,5 +203,5 @@ var App = new function () {
 		module: _module,
 		ready: _ready,
 		global: _global
-	}
-};
+	};
+})();

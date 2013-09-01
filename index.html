@@ -9,28 +9,18 @@
 	<script src="app.js"></script>
 	<script>
 
-		App.global(
-			{ kaffe: 'kaka' }
-		)
-		.global('cola', 'chips')
+		App.global({ 
+			'a': 1,
+			'b': 2
+		})
+		.global('c', 3)
 		.module('A', {
 			init: function () {
 				console.log('Module ' + this.name + ' was initialized');
 			},
-			name: 'A',
-			sayWhat: function() {
-				return 'what?';
+			helloWorld: function() {
+				console.log('Hello world!');
 			}
-		})
-		.module('B', {
-			init: function () {
-				console.log('Module ' + this.name + ' was initialized');
-			},
-			require: 'required-lib.js',
-			sayCheese: function() {
-				return 'Cheese!';
-			},
-			name: 'B'
 		})
 		.module({
 			init: function () {
@@ -38,20 +28,88 @@
 			}
 		})
 		.ready(function() {
-			console.log(App.module('B').sayCheese());
+			App.module('A').helloWorld();
 			console.log('All done!');
+			console.log(App.global('c'));
 		});
+
+		// This could be in another js file
+		App.module('B', {
+			init: function () {
+				console.log('Module ' + this.name + ' was initialized');
+			},
+			require: ['required-lib.js', 'required-lib2.js']
+		})
 
 	</script>
 
-	Methods
-	---------
+	<h1>App framework</h1>
 
-	global
+	<h2>App.global()</h2>
 
-	module
+	<p>Use to register global values used in the application</p>
 
-	ready
+	<p>
+		Register a global value<br />
+		App.global('name', 'value');
+	</p>
+
+	<p>
+		Register a several global values<br />
+		App.global({ 'a': 1, 'b', 2 });
+	</p>
+
+	<p>
+		Retrieve a global value<br />
+		App.global('name');
+	</p>
+
+	<h2>App.module()</h2>
+
+	<p>Use to register a module.</p>
+
+	<p>
+	Register a module<br/>
+	App.module('name', {
+		init: function () {
+			// ...
+		}
+	});
+	</p>
+
+	<p>
+	Register a unnamed module<br/>
+	App.module({
+		init: function () {
+			// ...
+		}
+	});
+	</p>
+
+	<p>
+	Register a module and required scripts<br/>
+	App.module({
+		init: function () {
+			// ...
+		},
+		require: ['script1.js', 'script2.js']
+	});
+	</p>
+
+	<p>
+	Retrieve a module<br/>
+	App.module('name');
+	</p>
+
+	<h2>App.ready()</h2>
+
+	<p>Use to register a handler that should run when all modules have been initialized.</p>
+
+	<p>
+	App.ready(function() {
+		// ...
+	});
+	</p>
 
 </body>
 </html>
