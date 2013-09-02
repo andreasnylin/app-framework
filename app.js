@@ -1,5 +1,5 @@
 /*
-	App framework version 0.4 2013-08-29
+	App framework version 0.5 2013-09-02
 	Created by Andreas Nylin andreas.nylin@gmail.com
 */
 var App = (function () {
@@ -9,9 +9,11 @@ var App = (function () {
 		// Stores all ready handlers
 		_readyHandlers = [],
 		// Stores all global values
-		_globals = [],
+		_globals = {},
 		// Keeps track of how many unnamed modules that have been registered
 		_unnamedIndex = 0,
+		// Keeps track of how many modules there are left to init
+		_modulesToInit = 0,
 		// Common utilities
 		_util = {
 			isString: function(a) {
@@ -57,6 +59,8 @@ var App = (function () {
 		else {
 			alert('Error: registering module.');
 		}
+
+		_modulesToInit++;
 		
 		return this;
 	}
@@ -179,19 +183,29 @@ var App = (function () {
 			$.each(_modules, function () {
 				// Load scripts before running init method
 				if ('require' in this) {
-					_loadScript(this, this.require, this.init);
+					_loadScript(this, 
+						this.require, 
+						function() { 
+							this.init();
+							_runReadyHandlers();
+					});
 				}
 				// Run the init method of the module
 				else if('init' in this) {
 					this.init();
+					_runReadyHandlers();
 				}
 			});
-			
-			// Loop all readyhandlers and run them
+		});
+	}
+
+	// Loops all ready handlers and calls them
+	function _runReadyHandlers() {
+		if(--_modulesToInit === 0) {
 			$.each(_readyHandlers, function() {
 				this.call(this);
 			});
-		});
+		}
 	}
 
 	_init();
