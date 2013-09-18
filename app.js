@@ -1,5 +1,5 @@
 /*
-	App framework version 0.5 2013-09-02
+	App framework version 0.6 2013-09-18
 	Created by Andreas Nylin andreas.nylin@gmail.com
 */
 var App = (function () {
@@ -75,6 +75,9 @@ var App = (function () {
 	function _registerModule(name, module) {
 		if(_validateModule(module)) {
 			module.name = name;
+			module.events = {};
+			module.on = _moduleEventHandler;
+			module.trigger = _moduleTriggerEvent;
 			_modules[name] = module;
 		}
 	}
@@ -85,12 +88,13 @@ var App = (function () {
 	* - The module to validate
 	*/
 	function _validateModule(module) {
-		if (!('init' in module)) {
-			alert('Error: module must have init method.');
-			return false;
+		var valid = module[ 'name' || 'events' || 'on' || 'trigger' ] === undefined;
+		
+		if(!valid) {
+			alert('Error: Module contains a reserved word.');
 		}
-
-		return true;
+		
+		return valid;
 	}
 
 	/**
@@ -186,8 +190,10 @@ var App = (function () {
 					_loadScript(this, 
 						this.require, 
 						function() { 
-							this.init();
-							_runReadyHandlers();
+							if('init' in this) {
+								this.init();
+								_runReadyHandlers();
+							}
 					});
 				}
 				// Run the init method of the module
@@ -205,6 +211,21 @@ var App = (function () {
 			$.each(_readyHandlers, function() {
 				this.call(this);
 			});
+		}
+	}
+
+	function _moduleEventHandler(name, handler) {
+		if (!this.events[name]) {
+			this.events[name] = [];
+		}
+		this.events[name].push(handler);
+	}
+
+	function _moduleTriggerEvent(name, data) {
+		var events = this.events[name], i, l;
+
+		for (i = 0, l = events.length; i < l; i++) {
+			events[i].call(this, data);
 		}
 	}
 
