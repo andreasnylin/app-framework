@@ -98,6 +98,22 @@ App.module({
 App.module('name');
 ```
 
+###App.module().on()
+
+Use to register an event handler.
+```javascript
+// Register an event handler for module a's 'myevent'. Module b's myEventHandler will run when 'myevent' is triggered
+App.module('a').on('myevent', App.module('b').myEventHandler);
+```
+
+###App.module().trigger()
+
+Use to trigger an event.
+```javascript
+// Trigger 'myevent'
+App.module('a').trigger('myevent');
+```
+
 ###App.ready()
 
 Use to register a handler that should run when all modules have been initialized.
