@@ -69,7 +69,7 @@ App.global('name');
 
 ###App.module()
 
-Use to register or retrieve a module. A module must have an init function defined.
+Use to register or retrieve a module. If a module has an init method defined this method will run when the module is loaded.
 ```javascript
 // Register a module
 App.module('name', { 
