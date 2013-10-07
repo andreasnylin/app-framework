@@ -1,8 +1,9 @@
 /*
-	App framework version 0.6 2013-09-18
+	App framework version 0.6.1 2013-10-7
 	Created by Andreas Nylin andreas.nylin@gmail.com
 */
 var App = (function () {
+	
 	'use strict';
 	// Stores all modules
 	var _modules = {},
@@ -57,7 +58,7 @@ var App = (function () {
 			_registerModule(name, module);
 		}
 		else {
-			alert('Error: registering module.');
+			throw 'Error: registering module.';
 		}
 
 		_modulesToInit++;
@@ -91,7 +92,7 @@ var App = (function () {
 		var valid = module[ 'name' || 'events' || 'on' || 'trigger' ] === undefined;
 		
 		if(!valid) {
-			alert('Error: Module contains a reserved word.');
+			throw 'Error: Module contains a reserved word.';
 		}
 		
 		return valid;
@@ -133,8 +134,7 @@ var App = (function () {
 	*/
 	function _ready(handler) {
 		if(typeof handler !== 'function') {
-			alert('Error: argument is not a function.');
-			return;
+			throw 'Error: argument is not a function.';
 		}
 	
 		_readyHandlers.push(handler);
